@@ -8,7 +8,9 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-models/
+# models/
+*.joblib
+*.h5
 build/
 develop-eggs/
 dist/
