@@ -3,6 +3,11 @@
 ## Overview
 This repository contains the code and resources for a **Signature Verification System** using machine learning. The project leverages advanced algorithms and computer vision techniques to verify signatures in real-time from a live camera feed. This system is designed to enhance document security, prevent fraud, and streamline verification processes.
 
+## Model link
+https://drive.google.com/drive/folders/1VXrJWlcGxzcujAbOs1_hyhZtrVDGV2My?usp=drive_link
+
+load the 'models' folder into the 'SigVer' folder
+
 ## Key Features
 - **Real-time Signature Verification**: Verifies signatures instantly from a camera feed.
 - **Machine Learning Models**:
@@ -89,4 +94,6 @@ Key Highlights:
 This project is a step towards integrating AI into secure document processing workflows. Explore the GitHub repository for more details: [Signature Verification System](https://github.com/CrazyBeastable/Signature-Verification-System)
 
 Feedback and collaboration opportunities are always welcome. Let’s innovate together!
+
+
 
