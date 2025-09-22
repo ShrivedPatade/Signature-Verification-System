@@ -15,6 +15,7 @@ from keras.initializers import glorot_uniform
 
 from tensorflow.keras.layers import Layer
 from keras.regularizers import l2
+import os
 import tensorflow.keras.backend as K
 
 def euclidean_distance(vects):
@@ -72,7 +73,9 @@ model = Model(inputs=[input_a, input_b], outputs=distance)
 
 rms = RMSprop(learning_rate=1e-4, rho=0.9, epsilon=1e-08)
 model.compile(loss=contrastive_loss, optimizer=rms)
-model.load_weights('net-020.weights.h5')
+
+weights_path = os.path.join(os.path.dirname(__file__), '../models/net-020.weights.h5')
+model.load_weights(weights_path)
 
 def preprocess(img, t):
   _, thresh = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
@@ -89,7 +92,7 @@ st.title("Signature Verification System")
 col1, _, col3 = st.columns([0.4, 0.1, 0.4])
 
 with col1:
-    t = st.number_input("Threshold Value", min_value=0, max_value=255, value=220)
+    t = st.number_input("Threshold Value", min_value=0, max_value=255, value=120)
     uploaded_files = st.file_uploader("Upload Signature Image...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
     if uploaded_files is not None:
@@ -101,7 +104,7 @@ with col1:
                 image = preprocess(image, t)
                 images.append(image)
 
-            st.image([np.squeeze(i) for i in images], caption=["Known Real", "Not Known"], use_column_width=True)
+            st.image([np.squeeze(i) for i in images], caption=["Known Real", "Not Known"], use_container_width=True)
         else:
             st.warning("Please upload exactly two images.")
 
@@ -116,7 +119,7 @@ with col3:
         img2 = np.expand_dims(images[1], axis=0)
         res = model.predict([img1, img2], verbose=0)
         diff = res[0][0]
-        if diff > 1.49:
+        if diff > thres:
             st.header("Signature is a proxy")
         else:
             st.header("Signature is real")

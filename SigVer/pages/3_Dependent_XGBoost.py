@@ -4,28 +4,35 @@ import joblib
 import cv2
 import numpy as np
 from skimage.feature import hog
+import os
 
 # Cache the model loading function for efficiency
 @st.cache_resource
 def load_model(file_path: str):
     return joblib.load(file_path)
 
-def preprocess(img, size=(128, 128)):
-    # Resize the image to the specified size
-    resized_img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
-    # Normalize the pixel values to the range [0, 1]
-    normalized_img = resized_img.astype(np.float64) / 255.0
+def preprocess(img):
+    # Resize the image to 128x128
+    resized_img = cv2.resize(img, (128, 128))
+    # Normalize pixel values to the range [0, 1]
+    normalized_img = np.array(resized_img, dtype=np.float64) / 255.0
     return normalized_img
 
 # Streamlit app configuration
-st.set_page_config(page_title='Proxy Detect | SVM')
+st.set_page_config(page_title='Proxy Detect | XGBoost')
 
 # Application title
 st.title("Signature Verification System")
 
 # Load the pre-trained models
-model_f = load_model("svmf.joblib")  # Model for classification (Genuine/Proxy)
-model_p = load_model("svmp.joblib")  # Model for person identification
+# Get the directory of the current script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Construct model paths relative to the script location
+model_f_path = os.path.join(BASE_DIR, "..", "models", "xgbf.joblib")
+model_p_path = os.path.join(BASE_DIR, "..", "models", "xgbp.joblib")
+model_f = load_model(model_f_path)  # Model for classification (Genuine/Proxy)
+model_p = load_model(model_p_path)  # Model for person identification
 
 # Layout: Create two columns with spacing in between
 col1, _, col3 = st.columns([0.4, 0.1, 0.4])
@@ -47,7 +54,7 @@ with col1:
         image = preprocess(image)
 
         # Display the uploaded and preprocessed image
-        st.image(image, caption='Uploaded Image.', use_column_width=True)
+        st.image(image, caption='Uploaded Image.', use_container_width=True)
 
         # Extract features using HOG
         features = hog(image, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1))
@@ -55,7 +62,7 @@ with col1:
 
 with col3:
     # Display the results section
-    st.header("Results - SVM")
+    st.header("Results - XGBoost")
 
     # Run button to trigger prediction
     if st.button("Run"):
@@ -65,7 +72,7 @@ with col3:
             ans = "Genuine"
         else:
             ans = "Proxy"
-        
+
         # Display classification result
         st.header(f"The signature provided is {ans}")
 

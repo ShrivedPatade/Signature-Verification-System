@@ -4,6 +4,7 @@ import joblib
 import cv2
 import numpy as np
 from skimage.feature import hog
+import os
 
 # Cache the model loading function for efficiency
 @st.cache_resource
@@ -18,14 +19,20 @@ def preprocess(img):
     return normalized_img
 
 # Streamlit app configuration
-st.set_page_config(page_title='Proxy Detect | XGBoost')
+st.set_page_config(page_title='Proxy Detect | Random Forest')
 
 # Application title
 st.title("Signature Verification System")
 
 # Load the pre-trained models
-model_f = load_model("xgbf.joblib")  # Model for classification (Genuine/Proxy)
-model_p = load_model("xgbp.joblib")  # Model for person identification
+# Get the directory of the current script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Construct model paths relative to the script location
+model_f_path = os.path.join(BASE_DIR, "models", "rff.joblib")
+model_p_path = os.path.join(BASE_DIR, "models", "rfp.joblib")
+model_f = load_model(model_f_path)  # Model for classification (Genuine/Proxy)
+model_p = load_model(model_p_path)  # Model for person identification
 
 # Layout: Create two columns with spacing in between
 col1, _, col3 = st.columns([0.4, 0.1, 0.4])
@@ -47,7 +54,7 @@ with col1:
         image = preprocess(image)
 
         # Display the uploaded and preprocessed image
-        st.image(image, caption='Uploaded Image.', use_column_width=True)
+        st.image(image, caption='Uploaded Image.', use_container_width=True)
 
         # Extract features using HOG
         features = hog(image, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1))
@@ -55,7 +62,7 @@ with col1:
 
 with col3:
     # Display the results section
-    st.header("Results - XGBoost")
+    st.header("Results - Random Forest")
 
     # Run button to trigger prediction
     if st.button("Run"):
